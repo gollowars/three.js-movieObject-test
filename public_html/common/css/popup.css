@@ -1,0 +1,87 @@
+@charset "utf-8";
+/**----------------------------------------------------------
+ *CSS information 
+ *
+ * file name	: popup.css
+ * style info	: popup用CSS
+ -----------------------------------------------------------*/
+ /* default style - リセット及びbody基本設定
+----------------------------------------------------------- */
+@import url("default.css");
+/* all style
+----------------------------------------------------------- */
+@import url("base.css");
+
+/* @override
+----------------------------------------------------------- */
+/*	#page
+----------------------------------------------------*/
+.popup #page {
+	width: auto;
+	margin: 0 0 1em 0;
+	padding:0 0 0 0;
+	text-align: left;
+}
+
+/*	#contents
+----------------------------------------------------*/
+.popup #contents {
+	width: auto;
+	margin:0 0 1em 0;
+	padding:1em 1em 0 1em;
+}
+
+.popup #contents .pageTop {
+	clear: both;
+	text-align: right;
+	margin-right:1em;
+}
+
+/* @popup style
+----------------------------------------------------------- */
+/*#header 
+----------------------------------------------------*/
+#header {
+}
+
+#header:after {
+	content: ".";
+	display: block;
+	visibility: hidden;
+	height: 0.1px;
+	font-size: 0.1em;
+	line-height: 0;
+	clear: both;
+}
+
+#header #logo {
+}
+
+#header #guideNavi {
+	text-align: right;
+	margin-bottom:10px;
+}
+
+#header #guideNavi li {
+	display: inline;
+	margin-right:1em;
+}
+
+/*#footer
+----------------------------------------------------*/
+#footer {
+}
+
+#footer ul {
+	margin-bottom:1em;
+}
+
+#footer ul li {
+	display: inline;
+	margin-right:1em;
+}
+
+#footer p.copyright {
+	text-align:right;
+	padding-bottom:0.3em;
+}

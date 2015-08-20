@@ -1,0 +1,231 @@
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+    ! STYLE NAME: guideline.css
+    ! UPDATE : 2009/02/24
+    ! DESCRIPTION:この CSS ではスタイルを書いていく際のルールなどを記述する。
+
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+
+/******************************!  RULES  !**********************************
+
+    QUICK TABLE OF CONTENTS
+    
+        1. CSSプロパティの記述順序
+        2. CSS HACK の記述ルール
+        3. CSS プロパティのショートハンドについて
+        4. CSS の分割
+        5. XML宣言について
+
+----------------------------------------------------------------------------------------
+
+    1. CSS プロパティの記述順序。
+    
+----------------------------------------------------------------------------------------
+
+    CSS プロパティの記述順序に関しては、CSS2 Specification (http://www.w3.org/TR/REC-CSS2/)
+    での出現順序を参考にする。なお、CSS2, Revision1 (http://www.w3.org/TR/CSS21/)で改訂され
+    サポートされなくなったプロパティについては記述しない。また、ページ・オーラルメディアに
+    関するプロパティは現在は記述していない。具体的に記述順序のリストは以下のようにする。
+        
+    * {
+        display
+        width
+        min-width
+        max-width
+        height
+        min-height
+        max-height
+        margin (shorthand)
+            margin-top
+            margin-right
+            margin-bottom
+            margin-left
+        padding (shorthand)
+            padding-top
+            padding-right
+            padding-bottom
+            padding-left
+        float
+        background (shorthand)
+            background-color
+            background-image
+            background-repeat
+            background-attachment
+            background-position
+        border (shorthand)
+            border-width
+            border-color
+            border-style
+        position
+            top
+            right
+            bottom
+            left
+        clear
+        z-index
+        direction
+        unicode-bidi
+        line-height
+        vartical-align
+        overflow
+        clip
+        visibility
+        content
+        quotes
+        counter-reset
+        counter-increment
+        list-style(shorthand)
+            list-style-type
+            list-style-image
+            list-style-position
+        color
+        font (shorthand)
+            font-family
+            font-style
+            font-variant
+            font-weight
+            font-size
+        text-indent
+        text-align
+        text-decoration
+        letter-spacing
+        word-spacing
+        text-transform
+        white-space
+        caption-side
+        table-layout
+        border-collapse
+        border-spacing
+        empty-cells
+        cursor
+        outline
+    }
+    
+----------------------------------------------------------------------------------------
+
+    2. CSS Hack の記述法
+    
+----------------------------------------------------------------------------------------
+    
+    CSS Hack を行う際には以下のように記述し対象ブラウザと何に対する Hack なのか
+    目的を明確にする。可能ならば参照ソースも用意する。
+    下記の例では、Star html hack を使っている。()はコメントアウト部分。
+    
+    #hack {
+        property: value;
+    }
+    
+    * html #hack { (FOR IE6 and below, xxx bug fix, see also: http://hogehoge.net/)
+        property: value;
+    }
+    
+    *>html #hack { (FOR IE7 and Grater, xxx bug fix, see also: http://foofoo.net/)
+        property: value;
+    }
+            
+    また、宣言ブロック内で行う際には以下のようにする。
+    
+    #hack {
+        property: value;
+        property: value;
+        _property: value; (FOR XXX, xxx fix)
+    }
+    
+    基本的にはハックフリーを目指します。
+
+----------------------------------------------------------------------------------------
+
+    3. プロパティの Shorthand について
+    
+----------------------------------------------------------------------------------------
+
+    margin, padding, border, list-style, background, font, outline はプロパティを
+    まとめて簡略化して記述できる（Shorthand）。
+    margin,paddingに関しては、指定が一つであれば、(Shorthand)は使用しない。
+    font 以外についてはなるべくそれを使って記述する。
+    
+----------------------------------------------------------------------------------------
+
+    4. CSS の 分割
+
+----------------------------------------------------------------------------------------
+
+    CSS はいくつかに分割する。
+        1. guideline.css(この CSS。CSSを記述する際における基本的なルールを定義) これはCSSフォルダに入れて置くだけでimportしなくてもよい。
+        2. default.css  (デフォルトのスタイルのリセット及びリンクカラーなどの基本設定)
+        3. module.css   (ヘッダー、フッターに関するスタイルを定義)
+        4. style.css (コンテンツに関するスタイルを定義)
+        6. print.css    (印刷用に関するスタイルを定義)
+        7. import.css   (上記 CSS を @import 規則を使って統括する)
+    
+----------------------------------------------------------------------------------------
+
+    5. XML宣言について
+
+----------------------------------------------------------------------------------------
+    
+    現在のCSSはIE6でXML宣言する(DTDの前に何か入れる)と、
+    レンダリングの方法が下位互換モードとなり、widthの解釈が変わってしまいます。
+    具体的には一つのブロック要素にwidthとpadding、borderを指定するとpadding、borderで
+    指定した幅がwidthに含まれてしまい、FireFoxなどのブラウザと大きく異なってしまいます。
+    
+    解決策としては、文字コードをutf-8もしくはutf-16にするとXML宣言しなくても文法的に間違い
+    ではなくなるので、文字コードをutf-8にし、XML宣言を削除。
+    
+    "XML宣言入れても崩れないコーディングは可能ですが、本来必要ではない余計なdivタグが増えてしまい、
+     SEO的にも改変のし易さ的にも色々問題が出てくると思うので、上記の方法をとりました"
+    
+----------------------------------------------------------------------------------------
+
+    6. フォントサイズの指定について
+    
+----------------------------------------------------------------------------------------
+    フォントサイズの指定方法は以下の二種類から最初に選択して仕様する。
+    [font-size:0.625を使う場合]
+    bodyにfont-size:0.625emを指定しているので、デフォルトサイズが10pxとなります。
+    ですので、各フォントサイズの指定は以下のようになります。
+    
+    px値      %値      em値
+    10px     100%     1.0em
+    11px     110%     1.1em
+    12px     120%     1.2em
+    13px     130%     1.3em
+    14px     140%     1.4em
+    15px     150%     1.5em
+    16px     160%     1.6em
+    17px     170%     1.7em
+    18px     180%     1.8em
+    19px     190%     1.9em
+    20px     200%     2.0em
+    21px     210%     2.1em
+    22px     220%     2.2em
+    23px     230%     2.3em
+    24px     240%     2.4em
+    25px     250%     2.5em
+    26px     260%     2.6em
+    
+    [font-size:76%を使う場合]
+    bodyにfont-size:76%を指定しているので、デフォルトサイズが12pxとなります。
+    ですので、各フォントサイズの指定は以下のようになります。
+    
+    px値      %値        em値
+    10px      84%     0.834em
+    11px      92%     0.917em
+    12px     100%     1.000em
+    13px     109%     1.084em
+    14px     117%     1.167em
+    15px     125%     1.250em
+    16px     134%     1.334em
+    17px     142%     1.417em
+    18px     150%     1.500em
+    19px     159%     1.584em
+    20px     167%     1.667em
+    21px     175%     1.750em
+    22px     184%     1.834em
+    23px     192%     1.917em
+    24px     200%     2.000em
+    25px     209%     2.084em
+    26px     217%     2.167em
+        
+        
+/******************************!  /RULES  !*********************************

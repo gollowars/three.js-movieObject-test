@@ -1,0 +1,22 @@
+body 		{ margin : 0px; padding:0px; overflow: hidden; background-color: #000000; cursor: crosshair; }
+#ui			{ margin:0px; position: absolute; width: 1024px; height:700px; overflow: hidden;}
+#timeline 	{ position: relative; width:386px; height:76px;background-image: url(../img/time_line.png); background-repeat:no-repeat}
+#title	  	{ position: relative;  width:1024px; height:158px; top:50px; }
+#startBtn 	{ position: relative; width:258px; height:79px; top:250px; }
+
+#timeline span {position: relative; left:145px; top:10px; font-family:Helvetica sans-serif,Arial; color : #FFFFFF}
+#time_sec{font-size: 30pt;}
+#time_point{font-size: 15pt;}
+#bottom {position: absolute; bottom: 0; left:0; width: 100%; height : 51px}
+#deathBird {position:absolute; float: right; }
+#killCnt {position:absolute; font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 30px; top:8px; left : 80px;}
+#items {position: absolute; left:200px; bottom:3px}
+#items li {display: inline; float: left; font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 20px; }
+
+#results {position: relative; width:263px; height:0px; top:100px; overflow:hidden; background-image: url(../img/result.png); background-repeat:no-repeat} 
+#result {position:relative; left:180px; top:96px}
+#result li{font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 15pt; margin-bottom:4px}
+#re_class{ position: absolute; width:100px; left:93px; top:42px; font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 30pt; margin-bottom:4px}
+#re_score{ font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 15pt; margin-top:15px; margin-bottom: 0px}
+#restart { position: relative; width: 148px; height:46px; top:130px;}
+#controlkey {position: absolute; right: 0px; bottom: 0px; float: right}

@@ -1,0 +1,228 @@
+@charset "utf-8";
+/**----------------------------------------------------------
+ *CSS information 
+ *
+ * file name	: base.css
+ * style info	:  基本設定、レイアウト、横幅設定など
+ -----------------------------------------------------------*/
+
+/*--- reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {
+	margin: 0 auto;
+	padding: 0;
+	
+}
+address,caption,cite,code,dfn,em,strong,th,var {
+	font-style: normal;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+caption,th {
+	text-align: left;
+}
+
+object {
+	display: block;
+}
+
+img,
+object,
+embed {
+	vertical-align: top;
+}
+hr,legend {
+	display: none;
+}
+h1,h2,h3,h4,h5,h6 {
+	font-size: 100%;
+}
+img,abbr,acronym,fieldset {
+	border: 0;
+}
+li {
+	list-style-type: none;
+}
+input {
+	outline: none;
+}
+textarea {
+	resize : none;
+	outline: none;
+}
+/* space */
+.ml5 { margin-left: 5px; }
+.ml10 { margin-left: 10px; }
+.ml15 { margin-left: 15px; }
+.ml20 { margin-left: 20px; }
+.ml25 { margin-left: 25px; }
+.ml30 { margin-left: 30px; }
+.ml40 { margin-left: 40px; }
+.ml50 { margin-left: 50px; }
+
+.mr5 { margin-right: 5px; }
+.mr10 { margin-right: 10px; }
+.mr15 { margin-right: 15px; }
+.mr20 { margin-right: 20px; }
+.mr25 { margin-right: 25px; }
+.mr30 { margin-right: 30px; }
+.mr40 { margin-right: 40px; }
+.mr50 { margin-right: 50px; }
+
+.mt5 { margin-top: 5px; }
+.mt10 { margin-top: 10px; }
+.mt15 { margin-top: 15px; }
+.mt20 { margin-top: 20px; }
+.mt25 { margin-top: 25px; }
+.mt30 { margin-top: 30px; }
+.mt40 { margin-top: 40px; }
+.mt50 { margin-top: 50px; }
+
+.mb5 { margin-bottom: 5px; }
+.mb10 { margin-bottom: 10px; }
+.mb15 { margin-bottom: 15px; }
+.mb20 { margin-bottom: 20px; }
+.mb25 { margin-bottom: 25px; }
+.mb30 { margin-bottom: 30px; }
+.mb40 { margin-bottom: 40px; }
+.mb50 { margin-bottom: 50px; }
+
+.pl5 { padding-left: 5px; }
+.pl10 { padding-left: 10px; }
+.pl15 { padding-left: 15px; }
+.pl20 { padding-left: 20px; }
+.pl25 { padding-left: 25px; }
+.pl30 { padding-left: 30px; }
+.pl40 { padding-left: 40px; }
+.pl50 { padding-left: 50px; }
+
+.pr5 { padding-right: 5px; }
+.pr10 { padding-right: 10px; }
+.pr15 { padding-right: 15px; }
+.pr20 { padding-right: 20px; }
+.pr25 { padding-right: 25px; }
+.pr30 { padding-right: 30px; }
+.pr40 { padding-right: 40px; }
+.pr50 { padding-right: 50px; }
+
+.pt5 { padding-top: 5px; }
+.pt10 { padding-top: 10px; }
+.pt15 { padding-top: 15px; }
+.pt20 { padding-top: 20px; }
+.pt25 { padding-top: 25px; }
+.pt30 { padding-top: 30px; }
+.pt40 { padding-top: 40px; }
+.pt50 { padding-top: 50px; }
+
+.pb5 { padding-bottom: 5px; }
+.pb10 { padding-bottom: 10px; }
+.pb15 { padding-bottom: 15px; }
+.pb20 { padding-bottom: 20px; }
+.pb25 { padding-bottom: 25px; }
+.pb30 { padding-bottom: 30px; }
+.pb40 { padding-bottom: 40px; }
+.pb50 { padding-bottom: 50px; }
+ 
+/*	基本設定、リンクカラーなど
+----------------------------------------------------*/
+* html input,
+* html textarea,
+* html select {/* for IF6 */
+	font-family: "ＭＳ Ｐゴシック","MS PGothic",Sans-Serif;
+}
+
+
+/*\*/
+* html body {
+	font-size: 62.5%;
+}
+* html table {
+	font-size: 100%;
+	line-height: 1.5;
+}
+*:first-child+html body {
+	font-size: 62.5%;
+}
+/**/
+
+/* link ---*/
+a:link {
+	color:#000000;
+	text-decoration: none;
+}
+
+a:visited {
+	color:#000000;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:active {
+}
+
+
+/*	汎用class
+----------------------------------------------------*/
+.imgR {
+	float: right;
+	margin: 0 0 1em 1em;
+}
+
+.imgL {
+	float: left;
+	margin: 0 1em 1em 0;
+}
+
+/*
+.external{
+	padding-left:1.5em;
+	background:url(../img/icon_external.gif)  no-repeat left center;
+}
+*/
+
+/* CSS3 FIX------------------*/
+/* last-child */
+.last-child{}
+/* nth-child */
+.n1th-child{}
+.n2th-child{}
+.n3th-child{}
+.n4th-child{}
+.n5th-child{}
+.n6th-child{}
+.n7th-child{}
+.n8th-child{}
+.n9th-child{}
+.n10th-child{}
+
+/* even - odd */
+.even{}
+.odd{}
+
+/* :focus */
+.focus{}
+
+/* clearfix */
+#hoge:after {
+	content: "."; display: block; visibility: hidden; height: 0.1px; font-size: 0.1em; line-height: 0; clear: both;
+}
+
+.clearfix:after {
+	content: "."; display: block; visibility: hidden; height: 0.1px; font-size: 0.1em; line-height: 0; clear: both;
+}
+
+br.clear {
+display: block; visibility: hidden; height: 0.1px; font-size: 0.1em; line-height: 0; clear: both;
+}
+
+/*	#navSkip (NavigationSkip)
+----------------------------------------------------*/
+span#navSkip {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
