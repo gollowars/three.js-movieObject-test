@@ -1,3 +1,573 @@
+/**
+ * @author bhouston / http://exocortex.com
+ * @author WestLangley / http://github.com/WestLangley
+ */
+
+THREE.Box3 = function ( min, max ) {
+
+	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
+	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
+
+};
+
+THREE.Box3.prototype = {
+
+	constructor: THREE.Box3,
+
+	set: function ( min, max ) {
+
+		this.min.copy( min );
+		this.max.copy( max );
+
+		return this;
+
+	},
+
+	setFromPoints: function ( points ) {
+
+		this.makeEmpty();
+
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+			this.expandByPoint( points[ i ] )
+
+		}
+
+		return this;
+
+	},
+
+	setFromCenterAndSize: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( center, size ) {
+
+			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+
+			this.min.copy( center ).sub( halfSize );
+			this.max.copy( center ).add( halfSize );
+
+			return this;
+
+		};
+
+	}(),
+
+	setFromObject: function () {
+
+		// Computes the world-axis-aligned bounding box of an object (including its children),
+		// accounting for both the object's, and childrens', world transforms
+
+		var v1 = new THREE.Vector3();
+
+		return function ( object ) {
+
+			var scope = this;
+
+			object.updateMatrixWorld( true );
+
+			this.makeEmpty();
+
+			object.traverse( function ( node ) {
+
+				var geometry = node.geometry;
+
+				if ( geometry !== undefined ) {
+
+					if ( geometry instanceof THREE.Geometry ) {
+
+						var vertices = geometry.vertices;
+
+						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+
+							v1.copy( vertices[ i ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+
+						var positions = geometry.attributes[ 'position' ].array;
+
+						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					}
+
+				}
+
+			} );
+
+			return this;
+
+		};
+
+	}(),
+
+	copy: function ( box ) {
+
+		this.min.copy( box.min );
+		this.max.copy( box.max );
+
+		return this;
+
+	},
+
+	makeEmpty: function () {
+
+		this.min.x = this.min.y = this.min.z = Infinity;
+		this.max.x = this.max.y = this.max.z = - Infinity;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
+
+	},
+
+	center: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+
+	},
+
+	size: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.subVectors( this.max, this.min );
+
+	},
+
+	expandByPoint: function ( point ) {
+
+		this.min.min( point );
+		this.max.max( point );
+
+		return this;
+
+	},
+
+	expandByVector: function ( vector ) {
+
+		this.min.sub( vector );
+		this.max.add( vector );
+
+		return this;
+
+	},
+
+	expandByScalar: function ( scalar ) {
+
+		this.min.addScalar( - scalar );
+		this.max.addScalar( scalar );
+
+		return this;
+
+	},
+
+	containsPoint: function ( point ) {
+
+		if ( point.x < this.min.x || point.x > this.max.x ||
+		     point.y < this.min.y || point.y > this.max.y ||
+		     point.z < this.min.z || point.z > this.max.z ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	},
+
+	containsBox: function ( box ) {
+
+		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
+			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	getParameter: function ( point, optionalTarget ) {
+
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		return result.set(
+			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
+			( point.z - this.min.z ) / ( this.max.z - this.min.z )
+		);
+
+	},
+
+	isIntersectionBox: function ( box ) {
+
+		// using 6 splitting planes to rule out intersections.
+
+		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+		     box.max.y < this.min.y || box.min.y > this.max.y ||
+		     box.max.z < this.min.z || box.min.z > this.max.z ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	},
+
+	clampPoint: function ( point, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( point ).clamp( this.min, this.max );
+
+	},
+
+	distanceToPoint: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( point ) {
+
+			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+			return clampedPoint.sub( point ).length();
+
+		};
+
+	}(),
+
+	getBoundingSphere: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Sphere();
+
+			result.center = this.center();
+			result.radius = this.size( v1 ).length() * 0.5;
+
+			return result;
+
+		};
+
+	}(),
+
+	intersect: function ( box ) {
+
+		this.min.max( box.min );
+		this.max.min( box.max );
+
+		return this;
+
+	},
+
+	union: function ( box ) {
+
+		this.min.min( box.min );
+		this.max.max( box.max );
+
+		return this;
+
+	},
+
+	applyMatrix4: function () {
+
+		var points = [
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3()
+		];
+
+		return function ( matrix ) {
+
+			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
+
+			this.makeEmpty();
+			this.setFromPoints( points );
+
+			return this;
+
+		};
+
+	}(),
+
+	translate: function ( offset ) {
+
+		this.min.add( offset );
+		this.max.add( offset );
+
+		return this;
+
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box3().copy( this );
+
+	}
+
+};
+
+
+/**
+ * @author hughes
+ */
+
+THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
+
+	THREE.Geometry.call( this );
+
+	this.type = 'CircleGeometry';
+
+	this.parameters = {
+		radius: radius,
+		segments: segments,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+	radius = radius || 50;
+	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+
+	var i, uvs = [],
+	center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
+
+	this.vertices.push(center);
+	uvs.push( centerUV );
+
+	for ( i = 0; i <= segments; i ++ ) {
+
+		var vertex = new THREE.Vector3();
+		var segment = thetaStart + i / segments * thetaLength;
+
+		vertex.x = radius * Math.cos( segment );
+		vertex.y = radius * Math.sin( segment );
+
+		this.vertices.push( vertex );
+		uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, ( vertex.y / radius + 1 ) / 2 ) );
+
+	}
+
+	var n = new THREE.Vector3( 0, 0, 1 );
+
+	for ( i = 1; i <= segments; i ++ ) {
+
+		this.faces.push( new THREE.Face3( i, i + 1, 0, [ n.clone(), n.clone(), n.clone() ] ) );
+		this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
+
+	}
+
+	this.computeFaceNormals();
+
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+
+};
+
+THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.CircleGeometry.prototype.constructor = THREE.CircleGeometry;
+
+/**
+ * @author bhouston / http://exocortex.com
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Sphere = function ( center, radius ) {
+
+	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
+	this.radius = ( radius !== undefined ) ? radius : 0;
+
+};
+
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
+
+	set: function ( center, radius ) {
+
+		this.center.copy( center );
+		this.radius = radius;
+
+		return this;
+	},
+
+	setFromPoints: function () {
+
+		var box = new THREE.Box3();
+
+		return function ( points, optionalCenter ) {
+
+			var center = this.center;
+
+			if ( optionalCenter !== undefined ) {
+
+				center.copy( optionalCenter );
+
+			} else {
+
+				box.setFromPoints( points ).center( center );
+
+			}
+
+			var maxRadiusSq = 0;
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+
+			}
+
+			this.radius = Math.sqrt( maxRadiusSq );
+
+			return this;
+
+		};
+
+	}(),
+
+	copy: function ( sphere ) {
+
+		this.center.copy( sphere.center );
+		this.radius = sphere.radius;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		return ( this.radius <= 0 );
+
+	},
+
+	containsPoint: function ( point ) {
+
+		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return ( point.distanceTo( this.center ) - this.radius );
+
+	},
+
+	intersectsSphere: function ( sphere ) {
+
+		var radiusSum = this.radius + sphere.radius;
+
+		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+
+	},
+
+	clampPoint: function ( point, optionalTarget ) {
+
+		var deltaLengthSq = this.center.distanceToSquared( point );
+
+		var result = optionalTarget || new THREE.Vector3();
+		result.copy( point );
+
+		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
+
+			result.sub( this.center ).normalize();
+			result.multiplyScalar( this.radius ).add( this.center );
+
+		}
+
+		return result;
+
+	},
+
+	getBoundingBox: function ( optionalTarget ) {
+
+		var box = optionalTarget || new THREE.Box3();
+
+		box.set( this.center, this.center );
+		box.expandByScalar( this.radius );
+
+		return box;
+
+	},
+
+	applyMatrix4: function ( matrix ) {
+
+		this.center.applyMatrix4( matrix );
+		this.radius = this.radius * matrix.getMaxScaleOnAxis();
+
+		return this;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.center.add( offset );
+
+		return this;
+
+	},
+
+	equals: function ( sphere ) {
+
+		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Sphere().copy( this );
+
+	}
+
+};
+
+
 (function()
 {
 	var sw,sh,
@@ -72,17 +642,23 @@
 
 	function rendering()
 	{
+
+
 		delta = clock.getDelta();
 		animation();
 
 		renderer.setDepthTest(true);
 		renderer.clear();
+
 		renderer.render(scene, camera);
 		renderer.setDepthTest(false);
 		renderer.render(uiScene, uiCamera);
 
 		stats.update();
 		requestAnimationFrame(rendering);
+
+
+
 	}
 
 
@@ -202,7 +778,10 @@
 		}
 
 
-		videoObj.update();
+		for(var i = 0;i<videoObjArray.length;i++){
+			videoObjArray[i].update();
+		}
+
 	}
 
 // ------------------------------------------------------------------------------------------------------------------------------------
@@ -264,7 +843,7 @@
 		crossHair,
 		projector;
 
-	var videoObj;
+	var videoObjArray = [];
 
 	function setup()
 	{
@@ -312,7 +891,52 @@
 
 
 		//video object sample
-		videoObj = new VideoObj(baseV);
+		var videoObj2 = new VideoObj({
+			x:-400,
+			y:1200
+		},"/asset/movie/clip.mp4");
+
+
+		var videoObj = new VideoObj({
+			x:0,
+			y:800
+		},"/asset/movie/clip2.mp4");
+
+
+		var videoObj3 = new VideoObj({
+			x:600,
+			y:1300
+		},"/asset/movie/clip3.mp4");
+
+		var videoObj4 = new VideoObj({
+			x:-1000,
+			y:800
+		},"/asset/movie/clip3.mp4");
+
+		var videoObj5 = new VideoObj({
+			x:1000,
+			y:850
+		},"/asset/movie/clip3.mp4");
+
+
+		videoObjArray.push(videoObj)
+		videoObjArray.push(videoObj2)
+		videoObjArray.push(videoObj3)
+		videoObjArray.push(videoObj4)
+		videoObjArray.push(videoObj5)
+
+
+		//ストレスチェック
+		// for(var x = 0;x < 5;x++){
+		// 	for(var y = 0;y < 1;y++){
+		// 		var videoObj = new VideoObj({
+		// 			x:-1000 + window.innerWidth/30 * x,
+		// 			y:300 + window.innerHeight/10 * y
+		// 		},"/asset/movie/clip.mp4");
+		// 	}
+
+		// 	videoObjArray.push(videoObj);
+		// }
 	}
 
 	function addEvent()
@@ -359,8 +983,10 @@
 
 	function onMouseMove(e){
 		// e.preventDefault();
-		mouse.x = (e.clientX / sw) * 2 - 1;
-		mouse.y = -(e.clientY / sh) * 2 + 1;
+		if(e.clientX != '' && e.clientX != ''){
+			mouse.x = (e.clientX / sw) * 2 - 1;
+			mouse.y = -(e.clientY / sh) * 2 + 1;
+		}
 	}
 
 
@@ -777,7 +1403,6 @@
 		if(this.bird.root.position.z > worldDepth * (worldScale-1))this.bird.root.position.z = -worldDepth;
 		if(this.bird.root.position.z < -worldDepth * (worldScale-1))this.bird.root.position.z = worldDepth;
 
-		// console.log(delta)
 	}
 
 	Bird.prototype.remove = function(){
@@ -954,19 +1579,16 @@
 	// 	<source src="https://15192.wpc.azureedge.net/8015192/dist04/clip/d5d4112f12244ea8a0cbff4d36b7e68e/clip.webm">
 	// </video>
 
-	 var video;
-	 var videoImageContext;
-	 var videoTexture
-	 function VideoObj(position)
+	 function VideoObj(position,src)
 	 {
-	 	this.pos = position.clone();
+	 	// this.pos = position.clone();
 
 
 	 	//video要素とそれをキャプチャするcanvas要素を生成
-		video = document.createElement('video');
-		video.src = "/asset/movie/clip.mp4";
-		video.load();
-		video.play();
+		this.video = document.createElement('video');
+		this.video.src = src;
+		this.video.load();
+		this.video.play();
 
 		// <video poster="https://15192.wpc.azureedge.net/8015192/dist04/clip/d5d4112f12244ea8a0cbff4d36b7e68e/th_w320_0001_m.jpg" preload="auto" class="video" autoplay="" controls="">
 		// 	<source src="https://15192.wpc.azureedge.net/8015192/dist04/clip/d5d4112f12244ea8a0cbff4d36b7e68e/clip.mp4">
@@ -977,35 +1599,71 @@
 		videoImage.width = 720;
 		videoImage.height = 1280;
 
-		videoImageContext = videoImage.getContext('2d');
-		videoImageContext.fillStyle = '#000000';
-		videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+		this.videoImageContext = videoImage.getContext('2d');
+		this.videoImageContext.fillStyle = '#000000';
+		this.videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
 
 		//生成したcanvasをtextureとしてTHREE.Textureオブジェクトを生成
-		videoTexture = new THREE.Texture(videoImage);
-		videoTexture.minFilter = THREE.LinearFilter;
-		videoTexture.magFilter = THREE.LinearFilter;
+		this.videoTexture = new THREE.Texture(videoImage);
+
+		this.videoTexture.minFilter = THREE.LinearFilter;
+		this.videoTexture.magFilter = THREE.LinearFilter;
+
+
 
 		//生成したvideo textureをmapに指定し、overdrawをtureにしてマテリアルを生成
-		var movieMaterial = new THREE.MeshBasicMaterial({map: videoTexture, overdraw: true, side:THREE.DoubleSide});
-		var movieGeometry = new THREE.CubeGeometry(360, 640, 10); // 立方体作成
-		var movieScreen = new THREE.Mesh(movieGeometry, movieMaterial);
+		var movieMaterial = new THREE.MeshBasicMaterial({map: this.videoTexture, overdraw: true, side:THREE.DoubleSide});
+		// var movieGeometry = new THREE.TetrahedronGeometry( 150 );
+		var movieGeometry = new THREE.PlaneGeometry(360/3, 640/3, 5, 5);
+		// var movieGeometry = new THREE.CubeGeometory(100, 100, 100);
+
+		// var movieGeometry = new THREE.CylinderGeometry( 0, 150, 220, 3 );
+		// var movieGeometry = new THREE.IcosahedronGeometry( 100, 1 );
+
+
+// 		geometry = new THREE.CylinderGeometry(100, 100, 400, 6, 6, false);
+// var cylinder = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+//     map: THREE.ImageUtils.loadTexture('http://jsrun.it/assets/w/u/w/y/wuwyI.png') }));
+// cylinder.overdraw = true;
+// scene.add(cylinder);
+
+
+		this.movieScreen = new THREE.Mesh(movieGeometry, movieMaterial);
 		// movieScreen.rotation.y = THREE.Math.degToRad(90);
 
-		movieScreen.position.y = 1000;
+		this.movieScreen.position.x = position.x;
+		this.movieScreen.position.y = position.y;
+		// this.movieScreen.position.z = 0;
+		// this.movieScreen.rotation.y = 1.1;
+		// this.movieScreen.rotation.x = 0.03;
+		// this.movieScreen.rotation.x = 1.2;
 
-		scene.add(movieScreen);
+		// this.movieScreen.rotation.y = 1.1;
 
+		//PlaneGeometry opt
+		this.movieScreen.rotation.x = 1.5;
+		this.movieScreen.rotation.y = 0.02;
+		this.movieScreen.rotation.z = -0.06;
+
+
+
+		scene.add(this.movieScreen);
+
+		// var material = new THREE.MeshBasicMaterial( { color: 0xeeee00 } );
+		// var geometry = new THREE.CircleGeometry( 200, 500 );
+		// var mesh = new THREE.Mesh( geometry, material );
+		// scene.add( mesh );
 	 }
 
 	 VideoObj.prototype.update = function(){
 	 	//loop updateの中で実行
-		if (video.readyState === video.HAVE_ENOUGH_DATA) {
-		    videoImageContext.drawImage(video, 0, 0);
-		    if (videoTexture) {
-		        videoTexture.needsUpdate = true;
+		if (this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
+		    this.videoImageContext.drawImage(this.video, 0, 0);
+		    if (this.videoTexture) {
+		        this.videoTexture.needsUpdate = true;
 		    }
 		}
+
 	 }
 
 	/*

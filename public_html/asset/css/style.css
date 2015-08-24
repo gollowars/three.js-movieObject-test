@@ -1,4 +1,4 @@
-body 		{ margin : 0px; padding:0px; overflow: hidden; background-color: #000000; cursor: crosshair; }
+body 		{ margin : 0px; padding:0px; overflow: hidden; background-color: #000000;  }
 #ui			{ margin:0px; position: absolute; width: 1024px; height:700px; overflow: hidden;}
 #timeline 	{ position: relative; width:386px; height:76px;background-image: url(../img/time_line.png); background-repeat:no-repeat}
 #title	  	{ position: relative;  width:1024px; height:158px; top:50px; }
@@ -13,7 +13,7 @@ body 		{ margin : 0px; padding:0px; overflow: hidden; background-color: #000000;
 #items {position: absolute; left:200px; bottom:3px}
 #items li {display: inline; float: left; font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 20px; }
 
-#results {position: relative; width:263px; height:0px; top:100px; overflow:hidden; background-image: url(../img/result.png); background-repeat:no-repeat} 
+#results {position: relative; width:263px; height:0px; top:100px; overflow:hidden; background-image: url(../img/result.png); background-repeat:no-repeat}
 #result {position:relative; left:180px; top:96px}
 #result li{font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 15pt; margin-bottom:4px}
 #re_class{ position: absolute; width:100px; left:93px; top:42px; font-family:Helvetica sans-serif,Arial; color : #FFFFFF; font-size: 30pt; margin-bottom:4px}
